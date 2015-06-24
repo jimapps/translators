@@ -38,8 +38,43 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 function detectWeb(doc, url) { return FW.detectWeb(doc, url); }
 function doWeb(doc, url) { return FW.doWeb(doc, url); }
 
+/**News - Jim*/
+FW.Scraper({
+itemType         : 'newspaperArticle',
+detect           : FW.Xpath('//h1[@class="lede-headline"]'),
+title            : FW.Xpath('//h1[@class="lede-headline"]').text().trim(),
+attachments      : [{ 
+  url: FW.Url(),
+  title:  "Bloomberg News Snapshot",
+  type: "text/html" }],
+creators         : FW.Xpath('//meta[@name="parsely-author"]/@content').text().replace(/^\s*by/, "").trimInternal().replace(/ -$/, "").split(/,| and /).cleanAuthor("author"),
+date             : FW.Xpath('//div[@class="published-info"]/time/@datetime').text(),
+abstractNote     : FW.Xpath('//div[@class="lede-dek"]').text(),
+websiteTitle     : "Bloomberg",
+section          : FW.Xpath('//meta[@name="parsely-section"]/@content').text(),
+publicationTitle : "Bloomberg"
+});
+
+/**Politics - Jim*/
+FW.Scraper({
+itemType         : 'newspaperArticle',
+detect           : FW.Xpath('//meta[@content="politics"]'),
+title            : FW.Xpath('//meta[@name="parsely-title"]/@content').text().trim(),
+attachments      : [{ 
+  url: FW.Url(),
+  title:  "Bloomberg Politics Snapshot",
+  type: "text/html" }],
+creators         : FW.Xpath('//meta[@name="parsely-author"]/@content').text().replace(/^\s*by/, "").trimInternal().replace(/ -$/, "").split(/,| and /).cleanAuthor("author"),
+date             : FW.Xpath('//meta[@name="parsely-pub-date"]/@content').text(),
+abstractNote     : FW.Xpath('//meta[@name="description"]/@content').text(),
+websiteTitle     : "Bloomberg",
+section          : FW.Xpath('//meta[@name="parsely-section"]/@content').text(),
+publicationTitle : "Bloomberg"
+});
+
  
 /**Webpage*/
+/**
 FW.Scraper({
 itemType         : 'webpage',
 detect           : FW.Xpath('//h1[contains(@class, "article_title")]'),
@@ -53,6 +88,7 @@ abstractNote     : FW.Xpath('//meta[@name="description"]/@content').text(),
 websiteTitle     : "Bloomberg",
 publicationTitle : FW.Xpath('//div[@id="mainColumn"]/div[1]/div/a/img/@title').text().prepend("CSM Blog: ")
 });
+**/
 
 /**BloombergView*/
 FW.Scraper({
@@ -62,12 +98,14 @@ title            : FW.Xpath('//h1[@class="headline"]').text().trim(),
 attachments      : [{ url: FW.Url().replace(/news\//, "news/print/"),
   title:  "Bloomberg Printable",
   type: "text/html" }],
-creators         : FW.Xpath('//div[@class="byline"]/a[@class="contributor_name"]').text().replace(/^\s*By/, "").trimInternal().replace(/ -$/, "").split(/ and /).cleanAuthor("author"),
-date             : FW.Xpath('//div[@class="metadata"]/time[@class="timestamp"]').text(),
+creators         : FW.Xpath('//meta[@class="article_contributor__name"]/@content').text().replace(/^\s*By/, "").trimInternal().replace(/ -$/, "").split(/ and /).cleanAuthor("author"),
+date             : FW.Xpath('//meta[@name="article:published_time"]/@content').text(),
 abstractNote     : FW.Xpath('//meta[@name="description"]/@content').text(),
 websiteTitle     : "BloombergView",
 publicationTitle : FW.Xpath('//div[@id="mainColumn"]/div[1]/div/a/img/@title').text().prepend("CSM Blog: ")
 });
+
+/**
 
 FW.MultiScraper({
 itemType         : 'multiple',
@@ -76,7 +114,10 @@ choices          : {
   titles :  FW.Xpath('//div[@class="news_item clearfix"]/a[@class="story_link"]').text().trim(),
   urls    :  FW.Xpath('//div[@class="news_item clearfix"]/a[@class="story_link"]').key("href")
 }
-});/** BEGIN TEST CASES **/
+});
+**/
+
+/** BEGIN TEST CASES **/
 var testCases = [
 	{
 		"type": "web",
